@@ -12,6 +12,8 @@ export const defaultTheme = {
     'DodgerBlue': '#1E90FF',
     'Blue': '#0000FF',
 
+    'green-500': '#008000',
+
     'red-500': '#AB222E',
     'red-700': '#7A1921',
 

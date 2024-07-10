@@ -1,17 +1,53 @@
 import { IoPlayOutline } from "react-icons/io5";
-import { CountDownContainer, FormContainer, HomeContainer, MinutesAmountInput, Separator, StartCountDownButton, TaskInput } from "./styles";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod'
+import zod from 'zod'
+import {
+    CountDownContainer,
+    FormContainer,
+    HomeContainer,
+    MinutesAmountInput,
+    Separator,
+    StartCountDownButton,
+    TaskInput
+} from "./styles";
 
-
+const newCycleFormValidationSchema = zod.object({
+    task: zod.string().min(1, 'Informe a tarefa'),
+    minutesAmount: zod
+        .number().
+        min(5, 'o ciclo precisa ser de no mínimo 60 minutos').
+        max(60, 'o ciclo precisa ser de no máximo 60 minutos'),
+})
+type NewCycleProps = zod.infer<typeof newCycleFormValidationSchema>
 export const Home = () => {
+
+    const { register, handleSubmit, watch, reset } = useForm<NewCycleProps>({
+        resolver: zodResolver(newCycleFormValidationSchema),
+        defaultValues: {
+            task: '',
+            minutesAmount: 0,
+        }
+    });
+
+    function handleCreateNewCycle(data) {
+        console.log(data);
+        reset();
+    }
+
+    const task = watch('task')
+    const isSubmitDisabled = !task
+
     return (
         <HomeContainer>
-            <form>
+            <form onSubmit={handleSubmit(handleCreateNewCycle)}>
                 <FormContainer>
                     <label htmlFor="">Vou trabalhar em</label>
                     <TaskInput
                         id="task"
                         placeholder="Dê um nome para o seu projeto!"
                         list="task-suggetions"
+                        {...register('task')}
                     />
 
                     <datalist id="task-suggetions">
@@ -30,6 +66,7 @@ export const Home = () => {
                         step={5}
                         min={5}
                         max={60}
+                        {...register('minutesAmount', { valueAsNumber: true })}
                     />
 
                     <span>minutos.</span>
@@ -42,7 +79,7 @@ export const Home = () => {
                     <span>0</span>
                 </CountDownContainer>
 
-                <StartCountDownButton type="submit">
+                <StartCountDownButton type="submit" disabled={isSubmitDisabled}>
                     <IoPlayOutline size={24} />
                     Start
                 </StartCountDownButton>
